@@ -18,7 +18,7 @@ initials = 'IMD';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 screen = struct('rectPix',{[0 0  1280 960]}, 'dist', {57},...
                 'size', {[37.59,  29.99]}, 'resolution', {[1280 960]},...
-                'calib_filename', {'0001_titchener_130226.mat'}); 
+                'calib_filename', {'Carrasco_L1_SonyGDM5402_sRGB_calibration_02292016.mat'}); 
 screen.centerPix = [(screen.rectPix(3)/2), (screen.rectPix(4)/2)];
     % In a new screen, run:
      %test = Screen('OpenWindow', screenVar.num, [], [0 0 1 1]); 
