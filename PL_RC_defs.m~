@@ -1,0 +1,278 @@
+function params = PL_RC_defs
+
+
+%change for each subj
+trainLoc = 1;
+orderType = 1;
+preCueType = 0;
+
+contThresh = .4;
+
+initials = 'IMD';
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      screen params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+screen = struct('num', {1}, 'rectPix',{[0 0  1280 960]}, 'dist', {57},...
+                   'size', {[40.19,30.22]}, 'resolution', {[1280 960]},...
+                   'calib_filename', {'0001_titchener_130226.mat'}); 
+screen.centerPix = [(screen.rectPix(3)/2), (screen.rectPix(4)/2)];
+    % In a new screen, run:
+     %test = Screen('OpenWindow', screenVar.num, [], [0 0 1 1]); 
+     %white = WhiteIndex(test);
+     %black = BlackIndex(test);
+     %Screen('Resolutions')
+%      %Screen('CloseAll');
+% white = 255; black = 0;
+% gray = (white+black)/2;
+% screen.bkColor = gray; screen.black = black; screen.white = white;
+
+%Compute deg to pixels ratio:
+ratio = degs2Pixels(screen.res, screen.size, screen.dist, [1 1]);
+ratioX = ratio(1); screen.ratioX = ratio(1); 
+ratioY = ratio(2); screen.ratioY = ratio(2);
+
+
+screen.width = screen.size{1}; screen.height = screen.size{2};
+initx = 0;
+inity = 0;
+
+AssertOpenGL;
+screens=Screen('Screens');
+screenNumber=max(screens);
+screen.white=WhiteIndex(screenNumber);
+screen.black=BlackIndex(screenNumber);
+screen.gray=round((screen.white+screen.black)/2);
+screen.inc=screen.white-screen.gray;
+screen.bgColor=screen.gray;
+
+
+[screen.windowPtr, screen.windowRect]=Screen(screenNumber,'OpenWindow',scr.bgColor);
+scr.resolution=[scr.windowRect(3) scr.windowRect(4)];
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      stimuli params 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
+              'possibleOri', {[0,45,90]}, 'num', {1},...
+              'XdistDeg',{0}, 'YdistDeg', {0},'radiusDeg', {5},...
+              'polarAng', {0},'bkColor', {screen.bkColor},'pilot', {0},...
+              'trainLoc', {trainLoc},'orderType',{orderType},'contrast',{contThresh},...
+              'gratingf',1.5,...
+              'flatSpread', .75);
+
+stim.gratingsiz = stim.sizeDeg(1);
+stim.apersiz = stim.gratingsiz;
+stiPar.aperpsiz  = angle2pix(screen,stim.apersiz);
+stiPar.gratingpsiz  = angle2pix(screen,stim.gratingsiz);
+
+
+stim.XdistDeg = stim.radiusDeg*cosd(stim.polarAng);
+stim.YdistDeg = stim.radiusDeg*sind(stim.polarAng);
+
+stim.XdistPix = deg2pix1Dim(stim.XdistDeg, ratioX); 
+stim.YdistPix = deg2pix1Dim(stim.YdistDeg, ratioY);
+
+stim.radiusPix = deg2pix1Dim(stim.radiusDeg, ratioX);
+
+stim.sizePix = floor(degs2Pixels(screen.res, screen.size, screen.dist, stim.sizeDeg)); %{[100 100]}
+
+rc1 = degs2Pixels(screen.res, screen.size, screen.dist, stim.sizeDeg); 
+stim.rectPix =[0, 0, rc1]; 
+
+% Define locations of stimuli in pixels
+stimlocation.L = nan(1,2); stimlocation.R = nan(1,2);
+stimlocation.L(1) = (screen.centerPix(1) - stim.XdistPix); stimlocation.L(2) = (screen.centerPix(2) - stim.YdistPix);
+stimlocation.R(1) = (screen.centerPix(1) + stim.XdistPix); stimlocation.R(2) = (screen.centerPix(2) - stim.YdistPix);
+
+stim.locationsPix = [stimlocation.L; stimlocation.R]; %define all locations of stimuli in an array
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%            noise params 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+noise.freqDiff_factor = 2; 
+
+noise.fre_low = stim.gratingf/freqDiff_factor;
+noise.fre_high = stim.gratingf*freqDiff_factor;
+
+
+noise.size = stim.apersiz;
+noise.fre_low = fre_low;
+noise.fre_high = fre_high;
+noise.ori_base = 0;
+noise.ori_diff = 90;
+noise.contrast = 0.2;
+noise.fixcontrast = 1;
+
+noise.noisepsiz = angle2pix(scr,noise.noisesiz);
+
+noise.ori_low = noise.ori_base-noise.ori_diff;
+noise.ori_high = noise.ori_base+noise.ori_diff;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%            fixation params 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Draw fixation cross, sizeCross is the cross size,
+% and sizeRect is the size of the rect surronding the cross
+fixation = struct('color',{white},'dur', {.3}, 'penWidthPix', {3}, 'bkColor', screen.bkColor,...
+                  'sizeCrossDeg', {[0.4 0.4]}, 'respColorVect', [0, 255, 0]);
+                  
+fixation.sizeCrossPix = degs2Pixels(screen.res, screen.size, screen.dist, fixation.sizeCrossDeg); % {15}
+fixation.rectPix = [0 0 fixation.sizeCrossPix(1) fixation.sizeCrossPix(2)];
+fixation.rectPix = CenterRectOnPoint(fixation.rectPix, screen.centerPix(1), screen.centerPix(2));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Pre Cue params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The experiment is set to either be valid (type 1) or neutral (type 0)
+preCue = struct('type', {preCueType}); 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Exogenous precue params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+preCueExg = struct('rectDeg', {[0.4 0.1]}, 'color',{screen.black}, 'bkColor', {screen.bkColor}, ...
+                   'dur', {.06}, 'penWidthPix', {1}, 'dist2stimDeg',{3.5}, 'validity', {1.0}); 
+sp1 = deg2pix1Dim(preCueExg.rectDeg(1), ratioX); sp2 = deg2pix1Dim(preCueExg.rectDeg(2), ratioY); 
+preCueExg.rectPix = [0 0 sp1 sp2]; 
+
+preCueExg.dist2stimPix = deg2pix1Dim(preCueExg.dist2stimDeg, ratioY);
+
+
+preCueExg.YdistPix = preCueExg.dist2stimPix + stim.YdistPix;
+
+preCueExglocation.L = nan(1,2); preCueExglocation.R = nan(1,2);
+preCueExglocation.L(1) = screen.centerPix(1) - stim.XdistPix; preCueExglocation.L(2) = (screen.centerPix(2) - preCueExg.YdistPix);
+preCueExglocation.R(1) = screen.centerPix(1) + stim.XdistPix; preCueExglocation.R(2) = (screen.centerPix(2) - preCueExg.YdistPix);
+
+preCueExg.locationsPix = nan(4,2);
+preCueExg.locationsPix = [preCueExglocation.L(1), preCueExglocation.L(2); 
+                          preCueExglocation.R(1), preCueExglocation.R(2)];
+
+
+
+%preCueExg.radiusPix = deg2pix1Dim(preCueExg.radiusDeg, ratioX); %ignore y ratio resolution TD
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Neutral precue params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+neutralCue = struct('rectDeg', {[0.2, 0.1]}, 'color',{screen.black}, 'bkColor', {screen.bkColor}, ...
+                   'dur', {0.06}, 'penWidthPix', {1}, 'dist2centerDeg', {0.9}); 
+sp1 = deg2pix1Dim(neutralCue.rectDeg(1), ratioX); sp2 = deg2pix1Dim(neutralCue.rectDeg(2), ratioY); 
+
+
+neutralCue.dist2centerPix = deg2pix1Dim(neutralCue.dist2centerDeg, ratioY);
+
+neutralCue.locationsPix1 = [screen.centerPix(1), (screen.centerPix(2) - neutralCue.dist2centerPix)];
+neutralCue.locationsPix2 = [screen.centerPix(1), (screen.centerPix(2) + neutralCue.dist2centerPix)];
+
+neutralCue.rectPix = [0 0 sp1 sp2];
+% 
+% neutralCue.rectPix1 = CenterRectOnPoint([0 0 sp1 sp2], neutralCue.locationsPix1(1),neutralCue.locationsPix1(2));
+% neutralCue.rectPix2 = CenterRectOnPoint([0 0 sp1 sp2], neutralCue.locationsPix2(1),neutralCue.locationsPix2(2));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     ISI params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ISI  = struct('preDur',{0.04}, 'postDur', {0.3}); 
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %     box params
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% box = struct('sizePixels', {30}, 'color',{white}, 'slopeVpix', {300}, 'slopeHpix',{150},...
+%              'bkColor', {screenVar.bkColor}, 'dur', {2}, 'penWidthPix', {5}); 
+% box.locationsPix = stim.locationsPix;
+% box.rectPix = CenterRectOnPoint([0 0 box.slopeHpix box.slopeVpix], stim.locationsPix(1,1), stim.locationsPix(1,2));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     post cue params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+postCue = struct('color',{screen.white},'bkColor', {screen.bkColor}, 'dur', {.4}, 'penWidthPix', {1.5},...
+                 'radiusDeg', {.65}); %, 'centerPix', {screenVar.centerPix});
+
+             
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     response params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+KbName('UnifyKeyNames');
+responseVar = struct( 'allowedRespKeys', {['1', '2']},'allowedRespKeysCodes',{[0 0]}, 'dur',{.9}, 'cueTone', {500}); 
+for i = 1:length(responseVar.allowedRespKeys)
+    responseVar.allowedRespKeysCodes(i) = KbName(responseVar.allowedRespKeys(i));
+end
+% Note that the correctness of the resp will be computed according to the
+% index in the array of resp so that allowedRespKeys(i) is the correct
+% response of stim.possibleAngles(i)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Trial params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+trial = struct('numTrialsInBlock', {240}, 'numTrialsPerLevel', {15});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Feedback params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+feedback = struct('dur', {0.1}, 'durNoResp', {.4}, 'high', {300}, 'low', {150}); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Block params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+block = struct('numBlocks', 2);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Stair params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+startCont1 = log10(50); startCont2 = log10(30);
+
+stair = struct('run', {1}, 'numTrialsPerStaircase', {60}, 'numStaircases', {2},...
+                   'startContrast', {[startCont1, startCont2]}, 'maxThresh', {2}, 'minThresh', {log10(.05)},...
+                   'startStepsize', {.4},'minStepsize', {10^-3});
+               
+% if (trialVars.numTrialsInBlock/stairVars.numTrialsPerStaircase) ~= 4
+%     error('# of Trials per Stair case should be FOUR TIMES the # of trials per block')
+% end
+
+%NOTE: # trials per staircase should be Half of # trials in block
+       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Eye Tracking params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+eye = struct('run', {1}, 'fixRangeDeg', {2}, 'eyeTracked', {2}, 'recalHoldDur', {1},...
+             'breakWaitDur', {.5});
+         
+eye.dots.color = (.25*white);
+
+eye.fixRangePix = degs2Pixels(screen.res, screen.size, screen.dist, eye.fixRangeDeg);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Text params
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+text = struct('color', screen.black, 'bkColor', screen.gray, 'size', 24);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      Save Data params 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+save = struct('fileName', {'PLendo'}, 'expTypeDirName', {'results'}, 'SubjectInitials', {initials});
+
+
+%-------------------------------------------------------------------------%
+%----------------------%%%%%%%%%%%%%%%%%%%--------------------------------%
+%                        TOTAL ALL params                                 %
+%----------------------%%%%%%%%%%%%%%%%%%%--------------------------------%
+%-------------------------------------------------------------------------%
+global params;
+params = struct('screen', screen, 'stim', stim, 'fixation', fixation, 'preCueExg', preCueExg, ...
+                'postCue', postCue, 'response', responseVar, 'trial', trial,...
+                'block', block, 'feedback', feedback, 'ISI', ISI, 'neutralCue', neutralCue,...
+                'text', text,'preCue', preCue, 'save', save, 'stair', stair, 'eye', eye); 
+
+end

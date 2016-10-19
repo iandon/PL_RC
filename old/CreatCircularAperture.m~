@@ -1,0 +1,22 @@
+function [mask] = CreatCircularAperture(imgsize,aperturePeakSpread,edgeTransitionSTD)
+% all inputs in pixels
+% 
+% imgsize: size of image
+% aperturePeakSpread: size of aperture at peak
+% edgeTransitionSTD: std of normpdf that smooths edge of aperture
+%
+% ian donovan 09/13/16
+
+
+
+mask = ones(imgsize);
+centerCoord = round(imgsize./2);
+for iX = 1:imgsize(1)
+    for iY = 1:imgsize(2)
+        coordX = iX-centerCoord(1); coordY = iY-centerCoord(2);
+        distFromCenterCurrent = sqrt(coordX^2+coordY^2);
+        if distFromCenterCurrent > aperturePeakSpread
+            mask(iX,iY) = normpdf(distFromCenterCurrent,aperturePeakSpread,edgeTransitionSTD)./normpdf(aperturePeakSpread,aperturePeakSpread,edgeTransitionSTD);
+        end
+    end
+end
