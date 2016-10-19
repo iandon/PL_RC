@@ -1,8 +1,8 @@
-clear all; 
+% clear all; 
 addpath(genpath('helper functions'));
 addpath(genpath('mgl'));
 
-PL_RC_params;
+PL_RC_params_STAIRcontrast;
 
 global params; params.practice.run = 0;
 
@@ -64,8 +64,8 @@ end
 
 %% main experimental loop
 for b = 1:numBlocks
-    [trialProc] = calcTrialsVars(b);
-    instructions(wPtr);
+    [trialProc] = calcTrialsVars_STAIRcontrast(b);
+    instructions_RC(wPtr);
     
     driftCorr = 1;
     if params.eye.run && (b > 1)
@@ -95,9 +95,9 @@ for b = 1:numBlocks
         recal = 0;
         
         switch i
-            case floor(nTrials/4), quarterBreak(wPtr,1)
+%             case floor(nTrials/4), quarterBreak(wPtr,1)
             case floor(nTrials/2), quarterBreak(wPtr,2)
-            case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
+%             case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
         end
          
         trialProc{i}.contrast = stair{b}.threshold;
@@ -113,11 +113,11 @@ for b = 1:numBlocks
             [trialProc, recal, breakFix.Block.recent, breakFix.Block.track]...
                            = breakProc(trialProc, nTrials, i, j, breakFix);
                        
-            stair{b} = upDownStaircase(stair{b}, (correctTrial==1)); %update staircase
         else    %Note: if there is no fixation break, the trial is not taken into account for stair casing
             results.Block.rt(i)      = respTrial.rt; 
             results.Block.key(i)     = respTrial.key(1);
             results.Block.correct(i) = correctTrial;
+            stair{b} = upDownStaircase(stair{b}, (correctTrial==1)); %update staircase
 %             Screen('Close');
         end
         

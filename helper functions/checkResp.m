@@ -6,25 +6,25 @@ global params;
 %
 % Inputs
 % resp: the key the observer pressed
-% ans: correct answer, one scalar with a value from 1:numPossibleResponses
+% correctAns: correct answer, one scalar with a value from 1:numPossibleResponses
 % 
 %
 
 
 ansIdx = params.response.allowedRespKeysCodes(correctAns);
-respIdx = find(resp.key(1) == params.response.allowedRespKeysCodes);
+% respIdx = find(resp.key(1) == params.response.allowedRespKeysCodes);
 
 
 if resp.check == 0
     correctTrial = 2;
 elseif resp.check == 1
-    if ansIdx == respIdx
+    if ansIdx == resp.key(1)
         correctTrial = 1;
     else
         correctTrial = 0;
     end
 end
 
-% correctTrial; %uncomment if you want correctness printed in the command line after each trial
+% correctTrial %uncomment if you want correctness printed in the command line after each trial
 
 end

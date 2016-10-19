@@ -2,7 +2,7 @@ function instructions(wPtr)
 global params;
 
 instruct = 'Is the stimulus tilted more counter-clockwise or more clockwise, relative to VERTICAL?';
-keys = sprintf('Press ''%s'' for counter-clockwise tilt or ''%s'' for clockwise tilt. ', params.response.allowedRespKeys(1), params.response.allowedRespKeys(2));
+keys = sprintf('Press ''%s'' for counter-clockwise tilt or ''%s'' for clockwise tilt. ', params.response.allowedRespKeys{1}(1), params.response.allowedRespKeys{2}(1));
 start = 'Press space to start!';
 
 Screen('TextSize', wPtr, params.text.size);

@@ -5,13 +5,13 @@ global params;
 fixRadiusPix = params.fixation.sizeCrossPix;
 
 x1 = params.screen.centerPix(1) - cosd(oriPossible+90)*fixRadiusPix(1);
-x2 = params.screen.centerPix(1) + cosd(oriPossible+90)*fixRadiusPix(1);
+x2 = params.screen.centerPix(1) + cosd(oriPossible)*fixRadiusPix(1);
 
-y1 = params.screen.centerPix(2) - sind(oriPossible+90)*fixRadiusPix(2);
-y2 = params.screen.centerPix(2) + sind(oriPossible+90)*fixRadiusPix(2);
+y1 = params.screen.centerPix(2) - sind(oriPossible)*fixRadiusPix(2);
+y2 = params.screen.centerPix(2) + sind(oriPossible)*fixRadiusPix(2);
 
 
-Screen('DrawLine',wPtr, params.postCue.color, x1, y1, x2, y2, params.fixation.penWidthPix);
+Screen('DrawLines',wPtr, params.postCue.color, x1, y1, x2, y2, params.fixation.penWidthPix);
 
 
 xHR= params.screen.centerPix(1)+ params.fixation.sizeCrossPix(1);

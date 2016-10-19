@@ -4,7 +4,7 @@ function params = PL_RC_params_TRAINING
 %change for each subj
 trainLoc = 1;                 % 1 = left, 2 = right
 orderType = 1;                % 1 = tLoc first, 2 = uLoc first
-uOri_InterCardinalType = 1;   % 1 = 45, 2 = 135;
+tOri = 0;                     % 0 or 90 deg
 preCueType = 0;               % 1 = attention, 0 = neutral
 
 
@@ -53,8 +53,6 @@ screen.bgColor=screen.gray;
 %      stimuli params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-uOri_InterCardinalOPTIONS = [45,135];
-uOri_InterCardinal = uOri_InterCardinalOPTIONS(uOri_InterCardinalType);
 
 stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
               'possibleOri', {[-1,1]}, 'num', {1},...
@@ -62,7 +60,8 @@ stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
               'polarAng', {0},'bgColor', {screen.bgColor},'pilot', {0},...
               'trainLoc', {trainLoc},'orderType',{orderType},'contrast',{contThresh},...
               'gratingf',1.5,...
-              'flatSpread', .75);
+              'flatSpread', .75,...
+              'baseOri', tOri);
 
 stim.gratingsize = stim.sizeDeg(1);
 stim.apersize = stim.gratingsize;
@@ -196,7 +195,7 @@ ISI  = struct('preDur',{0.04}, 'postDur', {0.3});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     post cue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.4}, 'penWidthPix', {fixation.penWidthPix},...
+postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.6}, 'penWidthPix', {fixation.penWidthPix},...
                  'radiusDeg', {.65}); %, 'centerPix', {screenVar.centerPix});
 
 %%             
@@ -204,9 +203,10 @@ postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.4}
 %     response params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 KbName('UnifyKeyNames');
-responseVar = struct( 'allowedRespKeys', {['1', '2']},'allowedRespKeysCodes',{[0 0]}, 'dur',{.9}, 'cueTone', {500}); 
-for i = 1:length(responseVar.allowedRespKeys)
-    responseVar.allowedRespKeysCodes(i) = KbName(responseVar.allowedRespKeys(i));
+response = struct('dur',{.9}, 'cueTone', {500});
+response.allowedRespKeys = {'1!','2@'};
+for i = 1:length(response.allowedRespKeys)
+    response.allowedRespKeysCodes(1,i) = KbName(response.allowedRespKeys{i});
 end
 % Note that the correctness of the resp will be computed according to the
 % index in the array of resp so that allowedRespKeys(i) is the correct

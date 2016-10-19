@@ -13,7 +13,7 @@ keyInstr ='Press SPACEBAR to continue.';
 
 Screen('TextSize', wPtr, params.text.size);
 Screen('TextColor', wPtr, params.text.color);
-Screen('TextBackgroundColor',wPtr, params.text.bkColor );
+Screen('TextBackgroundColor',wPtr, params.text.bgColor );
 
 Screen('DrawText', wPtr, instruct1, params.screen.centerPix(1)-300, params.screen.centerPix(2)-150);
 Screen('DrawText', wPtr, instruct2, params.screen.centerPix(1)-250, params.screen.centerPix(2)-100);

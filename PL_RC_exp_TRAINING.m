@@ -95,12 +95,12 @@ for b = 1:numBlocks
         recal = 0;
         
         switch i
-            case floor(nTrials/4), quarterBreak(wPtr,1)
+%             case floor(nTrials/4), quarterBreak(wPtr,1)
             case floor(nTrials/2), quarterBreak(wPtr,2)
-            case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
+%             case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
         end
          
-        trialProc{i}.ori = stair{b}.threshold*trialProc{i}.oriDir;
+        trialProc{i}.ori = params.stim.baseOri+(stair{b}.threshold*trialProc{i}.oriDir);
         
         trialProc{i}.stimStruct = makeStimulusStruct(params.screen, params.stim, params.noise, trialProc{i}.ori, trialProc{i}.presAbs,trialProc{i}.contrast);
         

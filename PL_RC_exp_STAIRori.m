@@ -95,9 +95,9 @@ for b = 1:numBlocks
         recal = 0;
         
         switch i
-            case floor(nTrials/4), quarterBreak(wPtr,1)
+%             case floor(nTrials/4), quarterBreak(wPtr,1)
             case floor(nTrials/2), quarterBreak(wPtr,2)
-            case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
+%             case floor(nTrials*(3/4)), quarterBreak(wPtr,3)
         end
          
         trialProc{i}.ori = stair{b}.threshold*trialProc{i}.oriDir;

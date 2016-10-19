@@ -5,6 +5,7 @@ function params = PL_RC_params_STAIRcontrast
 %change for each subj
 trainLoc = 1;                 % 1 = left, 2 = right
 orderType = 1;                % 1 = tLoc first, 2 = uLoc first
+tOri = 0;                     % 0 or 90 deg
 preCueType = 0;               % 1 = attention, 0 = neutral
 
 
@@ -12,13 +13,12 @@ contThresh = .6;
 
 initials = 'IMD';
 
-
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      screen params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 screen = struct('rectPix',{[0 0  1280 960]}, 'dist', {57},...
-                'size', {[37.59,  29.99]}, 'resolution', {[1280 960]},...
+                'size', {[40,  30]}, 'resolution', {[1280 960]},...
                 'calib_filename', {'Carrasco_L1_SonyGDM5402_sRGB_calibration_02292016.mat'}); 
 screen.centerPix = [(screen.rectPix(3)/2), (screen.rectPix(4)/2)];
     % In a new screen, run:
@@ -55,11 +55,10 @@ screen.bgColor=screen.gray;
 %      stimuli params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-uOri_InterCardinalOPTIONS = [45,135];
-uOri_InterCardinal = uOri_InterCardinalOPTIONS(uOri_InterCardinalType);
+uOri_InterCardinal = [45,135];
 
 stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
-              'possibleOri', {[0,90,uOri_InterCardinal]}, 'num', {1},...
+              'possibleOri', {[tOri, tOri, uOri_InterCardinal]}, 'num', {1},...
               'XdistDeg',{0}, 'YdistDeg', {0},'radiusDeg', {5},...
               'polarAng', {0},'bgColor', {screen.bgColor},'pilot', {0},...
               'trainLoc', {trainLoc},'orderType',{orderType},'contrast',{contThresh},...
@@ -192,7 +191,7 @@ ISI  = struct('preDur',{0.04}, 'postDur', {0.3});
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     post cue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.4}, 'penWidthPix', {fixation.penWidthPix},...
+postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.6}, 'penWidthPix', {fixation.penWidthPix},...
                  'radiusDeg', {.65}); %, 'centerPix', {screenVar.centerPix});
 
 
@@ -201,9 +200,10 @@ postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.4}
 %     response params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 KbName('UnifyKeyNames');
-responseVar = struct( 'allowedRespKeys', {['1', '2']},'allowedRespKeysCodes',{[0 0]}, 'dur',{.9}, 'cueTone', {500}); 
-for i = 1:length(responseVar.allowedRespKeys)
-    responseVar.allowedRespKeysCodes(i) = KbName(responseVar.allowedRespKeys(i));
+response = struct('dur',{.9}, 'cueTone', {500});
+response.allowedRespKeys = {'1!','2@'};
+for i = 1:length(response.allowedRespKeys)
+    response.allowedRespKeysCodes(1,i) = KbName(response.allowedRespKeys{i});
 end
 % Note that the correctness of the resp will be computed according to the
 % index in the array of resp so that allowedRespKeys(i) is the correct
@@ -235,7 +235,7 @@ block = struct('numBlocks', 10);
 startCont = .9;
 
 stair = struct('run', {1}, 'numTrialsPerStaircase', {trial.numTrialsInBlock}, 'numStaircases', {1},...
-               'startContrast', {startCont}, 'maxThresh', {1}, 'minThresh', {log10(.005)},...
+               'startContrast', {startCont}, 'maxThresh', {1}, 'minThresh', {.005},...
                'startStepsize', {.4},'minStepsize', {10^-3},'upRule',1,'downRule',3);
                
 % if (trialVars.numTrialsInBlock/stairVars.numTrialsPerStaircase) ~= 4
@@ -277,7 +277,7 @@ save = struct('fileName', {'PL_RC_contStair'}, 'expTypeDirName', {'results'}, 'S
 %-------------------------------------------------------------------------%
 global params;
 params = struct('screen', screen, 'stim', stim, 'fixation', fixation, 'preCueExg', preCueExg, ...
-                'postCue', postCue, 'response', responseVar, 'trial', trial,...
+                'postCue', postCue, 'response', response, 'trial', trial,...
                 'block', block, 'feedback', feedback, 'ISI', ISI, 'neutralCue', neutralCue,...
                 'text', text,'preCue', preCue, 'save', save, 'stair', stair, 'eye', eye,'noise',noise); 
 

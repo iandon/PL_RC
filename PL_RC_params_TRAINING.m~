@@ -1,10 +1,10 @@
 function params = PL_RC_params_TRAINING
 
-
+%%
 %change for each subj
 trainLoc = 1;                 % 1 = left, 2 = right
 orderType = 1;                % 1 = tLoc first, 2 = uLoc first
-uOri_InterCardinalType = 1;   % 1 = 45, 2 = 135;
+tOri = 0;                     % 0 or 90 deg
 preCueType = 0;               % 1 = attention, 0 = neutral
 
 
@@ -12,13 +12,13 @@ contThresh = .6;
 
 initials = 'IMD';
 
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      screen params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 screen = struct('rectPix',{[0 0  1280 960]}, 'dist', {57},...
                 'size', {[37.59,  29.99]}, 'resolution', {[1280 960]},...
-                'calib_filename', {'0001_titchener_130226.mat'}); 
+                'calib_filename', {'Carrasco_L1_SonyGDM5402_sRGB_calibration_02292016.mat'}); 
 screen.centerPix = [(screen.rectPix(3)/2), (screen.rectPix(4)/2)];
     % In a new screen, run:
      %test = Screen('OpenWindow', screenVar.num, [], [0 0 1 1]); 
@@ -48,13 +48,11 @@ screen.bgColor=screen.gray;
 
 % screen.resolution=[screen.windowRect(3) screen.windowRect(4)];
 
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      stimuli params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-uOri_InterCardinalOPTIONS = [45,135];
-uOri_InterCardinal = uOri_InterCardinalOPTIONS(uOri_InterCardinalType);
 
 stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
               'possibleOri', {[-1,1]}, 'num', {1},...
@@ -62,7 +60,8 @@ stim = struct('sizeDeg', {[3 3]}, 'dur', {.06},...
               'polarAng', {0},'bgColor', {screen.bgColor},'pilot', {0},...
               'trainLoc', {trainLoc},'orderType',{orderType},'contrast',{contThresh},...
               'gratingf',1.5,...
-              'flatSpread', .75);
+              'flatSpread', .75,...
+              ');
 
 stim.gratingsize = stim.sizeDeg(1);
 stim.apersize = stim.gratingsize;
@@ -90,7 +89,7 @@ stimlocation.R(1) = (screen.centerPix(1) + stim.XdistPix); stimlocation.R(2) = (
 stim.locationsPix = [stimlocation.L; stimlocation.R]; %define all locations of stimuli in an array
 
 
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            noise params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,6 +114,7 @@ noise.ori_low = noise.ori_base-(noise.ori_diff/2);
 noise.ori_high = noise.ori_base+(noise.ori_diff/2);
 
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %            fixation params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -128,6 +128,7 @@ fixation.rectPix = [0 0 fixation.sizeCrossPix(1) fixation.sizeCrossPix(2)];
 fixation.rectPix = CenterRectOnPoint(fixation.rectPix, screen.centerPix(1), screen.centerPix(2));
 
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Pre Cue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,6 +136,8 @@ fixation.rectPix = CenterRectOnPoint(fixation.rectPix, screen.centerPix(1), scre
 preCue = struct('type', {preCueType}); 
 
 
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Exogenous precue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,6 +163,9 @@ preCueExg.locationsPix = [preCueExglocation.L(1), preCueExglocation.L(2);
 
 %preCueExg.radiusPix = deg2pix1Dim(preCueExg.radiusDeg, ratioX); %ignore y ratio resolution TD
 
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Neutral precue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,18 +181,24 @@ neutralCue.locationsPix2 = [screen.centerPix(1), (screen.centerPix(2) + neutralC
 
 neutralCue.rectPix = [0 0 sp1 sp2];
 
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     ISI params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ISI  = struct('preDur',{0.04}, 'postDur', {0.3}); 
 
+
+
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     post cue params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 postCue = struct('color',{screen.white},'bgColor', {screen.bgColor}, 'dur', {.4}, 'penWidthPix', {fixation.penWidthPix},...
                  'radiusDeg', {.65}); %, 'centerPix', {screenVar.centerPix});
 
-             
+%%             
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     response params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -199,37 +211,41 @@ end
 % index in the array of resp so that allowedRespKeys(i) is the correct
 % response of stim.possibleAngles(i)
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Trial params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 trial = struct('numTrialsInBlock', {120}, 'numTrialsPerLevel', {60});
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Feedback params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 feedback = struct('dur', {0.1}, 'durNoResp', {.4}, 'high', {300}, 'low', {150});
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Block params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 block = struct('numBlocks', 10);
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Stair params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-startCont1 = log10(50); startCont2 = log10(30);
+startOriDiff = 15;
 
 stair = struct('run', {1}, 'numTrialsPerStaircase', {trial.numTrialsInBlock}, 'numStaircases', {2},...
-                   'startContrast', {[startCont1, startCont2]}, 'maxThresh', {2}, 'minThresh', {log10(.05)},...
-                   'startStepsize', {.4},'minStepsize', {10^-3});
+                   'startOri', {startOriDiff}, 'maxThresh', {30}, 'minThresh', {log10(.1)},...
+                   'startStepsize', {5},'minStepsize', {.001});
+               
                
 % if (trialVars.numTrialsInBlock/stairVars.numTrialsPerStaircase) ~= 4
 %     error('# of Trials per Stair case should be FOUR TIMES the # of trials per block')
 % end
 
-%NOTE: # trials per staircase should be Half of # trials in block
-       
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Eye Tracking params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,18 +256,19 @@ eye.dots.color = (.25*white);
 
 eye.fixRangePix = degs2Pixels(screen.resolution, screen.size, screen.dist, eye.fixRangeDeg);
 
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Text params
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 text = struct('color', screen.black, 'bgColor', screen.gray, 'size', 24);
 
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %      Save Data params 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 save = struct('fileName', {'PL_RC_training'}, 'expTypeDirName', {'results'}, 'SubjectInitials', {initials});
 
-
+%%
 %-------------------------------------------------------------------------%
 %----------------------%%%%%%%%%%%%%%%%%%%--------------------------------%
 %                        TOTAL ALL params                                 %
