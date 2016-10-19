@@ -11,7 +11,7 @@ Screen('TextBackgroundColor',wPtr, params.text.bgColor );
 %DrawFormattedText(wPtr, instruct, 'center', 'center', 1, []);
 
 Screen('DrawText', wPtr, instruct, params.screen.centerPix(1)-150, params.screen.centerPix(2)-150);
-Screen('DrawText', wPtr, keys, params.screen.centerPix(1)-350, params.screen.centerPix(2));
+Screen('DrawText', wPtr, keys, params.screen.centerPix(1)-250, params.screen.centerPix(2));
 Screen('DrawText', wPtr, start, params.screen.centerPix(1)-150, params.screen.centerPix(2)+150);
 
 Screen('Flip', wPtr);

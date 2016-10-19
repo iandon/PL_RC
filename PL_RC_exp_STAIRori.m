@@ -112,12 +112,11 @@ for b = 1:numBlocks
             breakFix.Block.count = breakFix.Block.count + 1;
             [trialProc, recal, breakFix.Block.recent, breakFix.Block.track]...
                            = breakProc(trialProc, nTrials, i, j, breakFix);
-                       
-            stair{b} = upDownStaircase(stair{b}, (correctTrial==1)); %update staircase
-        else    %Note: if there is no fixation break, the trial is not taken into account for stair casing
+        else    %Note: if there is a fixation break, the trial is not taken into account for stair-casing
             results.Block.rt(i)      = respTrial.rt; 
             results.Block.key(i)     = respTrial.key(1);
             results.Block.correct(i) = correctTrial;
+            stair{b} = upDownStaircase(stair{b}, (correctTrial==1)); %update staircase
 %             Screen('Close');
         end
         
